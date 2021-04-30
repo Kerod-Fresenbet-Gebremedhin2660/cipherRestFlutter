@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 class Response {
   final String message;
   final String result;
+  static http.Client httpClient = new http.Client();
 
   Response({@required this.message, @required this.result});
   factory Response.fromJson(Map<dynamic, dynamic> json) {
@@ -18,40 +19,40 @@ class Response {
   String get response_result {
     return result;
   }
-}
 
-Future<Response> decipher(int cipherShift, String cipheredText) async {
-  final response = await http.post(
-    Uri.https('localhost:5000', '/decipher'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<dynamic, dynamic>{
-      'cipherShift': cipherShift,
-      'cipheredText': cipheredText
-    }),
-  );
+  static Future<Response> decipher(int cipherShift, String cipheredText) async {
+    final response = await httpClient.post(
+      Uri.http('192.168.12.1:5000', '/api/decipher'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'cipher_shift': cipherShift,
+        'ciphered_text': cipheredText
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    return Response.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to get response');
+    if (response.statusCode == 200) {
+      return Response.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to get response');
+    }
   }
-}
 
-Future<Response> cipher(int cipherShift, String text) async {
-  final response = await http.post(
-    Uri.https('localhost:5000', '/cipher'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(
-        <dynamic, dynamic>{'cipherShift': cipherShift, 'cipheredText': text}),
-  );
+  static Future<Response> cipher(int cipherShift, String text) async {
+    final response = await httpClient.post(
+      Uri.http('192.168.12.1:5000', '/api/cipher'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(
+          <dynamic, dynamic>{'cipherShift': cipherShift, 'cipheredText': text}),
+    );
 
-  if (response.statusCode == 200) {
-    return Response.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to get response');
+    if (response.statusCode == 200) {
+      return Response.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to get response');
+    }
   }
 }

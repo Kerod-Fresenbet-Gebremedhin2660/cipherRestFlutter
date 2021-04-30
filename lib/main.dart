@@ -12,11 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Home Page'),
+      home: MyHomePage(title: 'Caesarean Cipher'),
     );
   }
 }
@@ -30,22 +31,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController c_shift = new TextEditingController();
-  TextEditingController c_text = new TextEditingController();
+  TextEditingController cShift = new TextEditingController();
+  TextEditingController cText = new TextEditingController();
 
-  Future<Response> store;
-  String _text = '';
+  Response store;
+  String _text = 'PlaceHolder';
 
-  void _decryptText() {
+  void getText() async {
+    _text = await decryptText();
+    setter();
+  }
+
+  void setter() {
     setState(() {
-      store = decipher(int.parse(c_shift.text), c_text.text);
+      _text;
     });
   }
 
-  void _encryptText() {
-    setState(() {
-      store = cipher(int.parse(c_shift.text), c_text.text);
-    });
+  Future<String> decryptText() async {
+    store = await Response.decipher(int.parse(cShift.text), cText.text);
+    var result = store.result;
+    return result;
+  }
+
+  Future<String> encryptText() async {
+    store = await Response.cipher(int.parse(cShift.text), cText.text);
+    var result = store.result;
+    return result;
   }
 
   @override
@@ -63,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: EdgeInsets.all(0),
                 padding: EdgeInsets.all(20),
                 child: TextField(
-                  controller: c_shift,
+                  controller: cShift,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(), hintText: 'Cipher Key'),
                 ),
@@ -74,28 +86,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: EdgeInsets.all(5),
                 padding: EdgeInsets.all(20),
                 child: TextField(
-                  controller: c_text,
+                  controller: cText,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(), hintText: 'Text'),
                 ),
               ),
             ),
-            FutureBuilder<Response>(
-              future: store,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(snapshot.data.result);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                // By default, show a loading spinner.
-                return CircularProgressIndicator();
-              },
+            Text(
+              '$_text',
+              style: Theme.of(context).textTheme.headline4,
             ),
             IconButton(
               icon: Icon(Icons.architecture_outlined),
               iconSize: 48,
-              onPressed: encryptText(),
+              onPressed: getText,
             ),
           ],
         ),
