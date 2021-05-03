@@ -1,13 +1,13 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:meta/meta.dart';
 
 class Response {
   final String message;
   final String result;
   static http.Client httpClient = new http.Client();
 
-  Response({@required this.message, @required this.result});
+  Response({required this.message, required this.result});
+
   factory Response.fromJson(Map<dynamic, dynamic> json) {
     return Response(message: json['message'], result: json['result']);
   }
@@ -45,8 +45,10 @@ class Response {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(
-          <dynamic, dynamic>{'cipherShift': cipherShift, 'cipheredText': text}),
+      body: jsonEncode(<dynamic, dynamic>{
+        'cipher_shift': cipherShift,
+        'to_be_ciphered_text': text
+      }),
     );
 
     if (response.statusCode == 200) {
